@@ -17,68 +17,6 @@ If you want to quickly add secure token-based authentication to Node.js apps, fe
 
 ## Usage
 
-### Configure Strategy
-
-The JWT authentication strategy is constructed as follows:
-
-    new JwtStrategy(options, verify)
-
-`options` is an object literal containing options to control how the token is
-extracted from the request or verified.
-
-* `secretOrKey` is a string or buffer containing the secret
-  (symmetric) or PEM-encoded public key (asymmetric) for verifying the token's
-  signature. REQUIRED unless `secretOrKeyProvider` is provided.
-* `secretOrKeyProvider` is a callback in the format `function secretOrKeyProvider(request, rawJwtToken, done)`,
-  which should call `done` with a secret or PEM-encoded public key (asymmetric) for the given key and request combination.
-  `done` accepts arguments in the format `function done(err, secret)`. Note it is up to the implementer to decode rawJwtToken.
-  REQUIRED unless `secretOrKey` is provided.
-* `jwtFromRequest` (REQUIRED) Function that accepts a request as the only
-  parameter and returns either the JWT as a string or *null*. See
-  [Extracting the JWT from the request](#extracting-the-jwt-from-the-request) for
-  more details.
-* `issuer`: If defined the token issuer (iss) will be verified against this
-  value.
-* `audience`: If defined, the token audience (aud) will be verified against
-  this value.
-* `algorithms`: List of strings with the names of the allowed algorithms. For instance, ["HS256", "HS384"].
-* `ignoreExpiration`: if true do not validate the expiration of the token.
-* `passReqToCallback`: If true the request will be passed to the verify
-  callback. i.e. verify(request, jwt_payload, done_callback).
-* `jsonWebTokenOptions`: passport-jwt is verifying the token using [jsonwebtoken](https://github.com/auth0/node-jsonwebtoken).
-Pass here an options object for any other option you can pass the jsonwebtoken verifier. (i.e maxAge)
-
-`verify` is a function with the parameters `verify(jwt_payload, done)`
-
-* `jwt_payload` is an object literal containing the decoded JWT payload.
-* `done` is a passport error first callback accepting arguments
-  done(error, user, info)
-
-An example configuration which reads the JWT from the http
-Authorization header with the scheme 'bearer':
-
-```js
-var JwtStrategy = require('passport-jwt').Strategy,
-    ExtractJwt = require('passport-jwt').ExtractJwt;
-var opts = {}
-opts.jwtFromRequest = ExtractJwt.fromAuthHeaderAsBearerToken();
-opts.secretOrKey = 'secret';
-opts.issuer = 'accounts.examplesoft.com';
-opts.audience = 'yoursite.net';
-passport.use(new JwtStrategy(opts, function(jwt_payload, done) {
-    User.findOne({id: jwt_payload.sub}, function(err, user) {
-        if (err) {
-            return done(err, false);
-        }
-        if (user) {
-            return done(null, user);
-        } else {
-            return done(null, false);
-            // or you could create a new account
-        }
-    });
-}));
-```
 
 ### Extracting the JWT from the request
 
@@ -159,9 +97,3 @@ To generate test-coverage reports:
     npm install -g istanbul
     npm run-script testcov
     istanbul report
-
-## License
-
-The [MIT License](http://opensource.org/licenses/MIT)
-
-Copyright (c) 2015 Mike Nicholson
